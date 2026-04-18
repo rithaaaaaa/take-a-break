@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#fff9f9"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Take a Break!"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icons/icon192.png"/>
+  <title>Take a Break!</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #fff9f9;
+      color: #2a3b19;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container { width: 100%; max-width: 420px; }
+    .screen { display: none; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    .card { background: #fff9f9; border-radius: 20px; padding: 24px; border: 1.5px solid #a4b792; }
+    h1 { font-size: 24px; font-weight: 600; color: #2a3b19; text-align: center; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #3d5919; text-align: center; margin-bottom: 20px; }
+    .label-sm { font-size: 11px; color: #a4b792; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 4px; }
+    .logo { font-size: 36px; text-align: center; margin-bottom: 10px; }
+
+    .topic-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+    .topic-chip {
+      padding: 7px 15px; border-radius: 20px; font-size: 13px; cursor: pointer;
+      border: 1.5px solid #a4b792; background: #fff9f9; color: #3d5919;
+      transition: all 0.2s; font-family: Georgia, serif;
+    }
+    .topic-chip.selected { border-color: #2a3b19; background: #c8d4bc; color: #2a3b19; font-weight: 600; }
+
+    .btn {
+      display: block; width: 100%; padding: 13px; border-radius: 12px;
+      border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; margin-bottom: 10px; font-family: Georgia, serif;
+    }
+    .btn-primary { background: #2a3b19; color: #fff9f9; }
+    .btn-primary:hover { background: #3d5919; }
+    .btn-primary:disabled { background: #a4b792; color: #e6e7e2; cursor: not-allowed; }
+    .btn-secondary { background: #e6e7e2; color: #3d5919; border: 1.5px solid #a4b792; }
+    .btn-secondary:hover { border-color: #2a3b19; }
+
+    .topic-cards { display: flex; gap: 12px; margin-bottom: 16px; }
+    .topic-card {
+      flex: 1; padding: 22px 10px; border-radius: 14px; text-align: center;
+      border: 1.5px solid #a4b792; background: #e6e7e2; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .topic-card:hover, .topic-card:active { border-color: #2a3b19; background: #c8d4bc; transform: translateY(-2px); }
+    .topic-card .emoji { font-size: 28px; }
+    .topic-card .name { font-size: 13px; font-weight: 600; margin-top: 8px; color: #3d5919; }
+
+    .fact-box {
+      background: #e6e7e2; border-radius: 14px; padding: 18px;
+      border: 1.5px solid #a4b792; margin-bottom: 16px;
+    }
+    .fact-topic { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #3d5919; margin-bottom: 8px; }
+    .fact-text { font-size: 14px; line-height: 1.75; color: #2a3b19; }
+
+    .feedback-row { display: flex; gap: 12px; margin-bottom: 16px; justify-content: center; }
+    .feedback-btn {
+      padding: 10px 28px; border-radius: 20px; font-size: 20px;
+      border: 1.5px solid #a4b792; background: #e6e7e2; cursor: pointer; transition: all 0.2s;
+    }
+    .feedback-btn.active-up { border-color: #2a3b19; background: #c8d4bc; }
+    .feedback-btn.active-down { border-color: #a4b792; background: #d4d4d0; }
+
+    .footer-links { display: flex; justify-content: center; gap: 20px; padding-top: 12px; }
+    .footer-links a { font-size: 13px; color: #a4b792; text-decoration: none; font-family: Georgia, serif; }
+    .footer-links a:hover { color: #2a3b19; }
+
+    /* Settings */
+    .settings-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #3d5919; padding: 0; }
+    .section-title { font-size: 11px; font-weight: 600; color: #a4b792; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; margin-top: 20px; }
+    .time-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+    select {
+      background: #e6e7e2; border: 1.5px solid #a4b792; color: #2a3b19;
+      border-radius: 8px; padding: 9px 12px; font-size: 14px; outline: none;
+      font-family: Georgia, serif; cursor: pointer;
+    }
+    select:focus { border-color: #2a3b19; }
+    .saved-msg { color: #3d5919; font-size: 13px; display: none; text-align: center; padding: 8px 0; }
+    .danger-btn {
+      background: #e6e7e2; color: #8b3a3a; border: 1.5px solid #c4a4a4;
+      padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: Georgia, serif;
+    }
+
+    /* Notification prompt */
+    .notif-banner {
+      background: #e6e7e2; border: 1.5px solid #a4b792; border-radius: 12px;
+      padding: 14px; margin-bottom: 16px; font-size: 13px; color: #2a3b19;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .notif-banner button {
+      background: #2a3b19; color: #fff9f9; border: none; border-radius: 8px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+      font-family: Georgia, serif; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ONBOARDING -->
+  <div id="screen-onboard" class="screen active card">
+    <div class="logo">☕</div>
+    <h1>Take a Break!</h1>
+    <p class="subtitle">Learn something new every day.</p>
+    <div class="label-sm" style="margin-bottom:12px">Pick your topics</div>
+    <div class="topic-grid" id="onboard-topics"></div>
+    <button class="btn btn-primary" id="onboard-submit" disabled>Let's Go →</button>
+  </div>
+
+  <!-- TOPIC CHOOSER -->
+  <div id="screen-choose" class="screen card">
+    <div class="label-sm">Time to Learn</div>
+    <h1>Take a Break!</h1>
+    <p class="subtitle">What are you curious about today?</p>
+    <div class="topic-cards" id="topic-cards"></div>
+    <div class="footer-links">
+      <a href="#" id="shuffle-topics">🔀 New Topics</a>
+      <a href="#" id="open-settings">⚙ Settings</a>
+    </div>
+  </div>
+
+  <!-- FACT -->
+  <div id="screen-fact" class="screen card">
+    <div class="fact-box">
+      <div class="fact-topic" id="fact-topic-label"></div>
+      <div class="fact-text" id="fact-text"></div>
+    </div>
+    <div class="feedback-row">
+      <button class="feedback-btn" id="btn-up">👍</button>
+      <button class="feedback-btn" id="btn-down">👎</button>
+    </div>
+    <button class="btn btn-primary" id="btn-learn-more">🔍 Learn More</button>
+    <button class="btn btn-secondary" id="btn-another-fact">🔄 Another Fact</button>
+    <button class="btn btn-secondary" id="btn-change-topic">🔀 Choose Another Topic</button>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="screen-settings" class="screen card">
+    <div class="settings-header">
+      <button class="back-btn" id="back-btn">←</button>
+      <h1 style="text-align:left;font-size:20px">⚙️ Settings</h1>
+    </div>
+    <p class="subtitle" style="text-align:left">Customize your experience.</p>
+
+    <div id="notif-banner" class="notif-banner" style="display:none">
+      <span>Enable notifications for daily reminders</span>
+      <button id="enable-notif">Enable</button>
+    </div>
+
+    <div class="section-title">Daily Reminder Time</div>
+    <div class="time-row">
+      <select id="popup-hour">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+        <option selected>9</option><option>10</option><option>11</option><option>12</option>
+      </select>
+      <select id="popup-minute">
+        <option value="0">00</option><option value="15">15</option>
+        <option value="30">30</option><option value="45">45</option>
+      </select>
+      <select id="popup-ampm">
+        <option>AM</option><option selected>PM</option>
+      </select>
+    </div>
+
+    <div class="section-title">Topic Pool</div>
+    <div class="topic-grid" id="settings-topics" style="margin-bottom:20px"></div>
+
+    <button class="btn btn-primary" id="save-settings">Save Changes</button>
+    <div class="saved-msg" id="saved-msg">✓ Saved!</div>
+
+    <div class="section-title">Reset</div>
+    <button class="danger-btn" id="reset-btn">Reset All Preferences</button>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
