@@ -1,5 +1,5 @@
 const CACHE = "take-a-break-v1";
-const ASSETS = ["/", "/index.html", "/app.js", "/manifest.json", "/icons/icon192.png", "/icons/icon512.png"];
+const ASSETS = ["/", "/index.html", "/app.js", "/manifest.json", "/icon192.png", "/icon512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
